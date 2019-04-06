@@ -1,5 +1,6 @@
 # R fliles
-.Rbuildignore
-/.Rproj.user/
-.Rhistory
 report.tools.Rproj
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata

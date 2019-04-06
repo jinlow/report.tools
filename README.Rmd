@@ -1,0 +1,27 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# report.tools
+
+The goal of this package is to provide helper functions for creating analytic reports, and easily outputting them to excel. 
+
+## Installation
+
+You can install the report.tools directly from github. 
+
+```{r, eval=FALSE}
+if (!requireNamespace("devtools", quietly = TRUE)) {
+    install.packages("devtools")}
+devtools::install_github("https://github.com/jinlow/report.tools")
+```
