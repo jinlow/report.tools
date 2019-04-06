@@ -25,3 +25,12 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
     install.packages("devtools")}
 devtools::install_github("https://github.com/jinlow/report.tools")
 ```
+
+## Progress
+The following functionality will be added to the package.
+
+- [x] Frequency Table Function
+- [ ] Generalized table to excel functions using openxlsx
+- [ ] Fast data waterfall table and function
+- [ ] Functions for making formatted cuts for tables
+- [ ] Intuitive dollar, time and count cut functions
