@@ -32,7 +32,7 @@ freq_table <- function(x,
   if (!("data.table" %in% class(x))) {
     x <- as.data.table(x[,c(...), drop = FALSE])
   }
-  if (length(c(...)) > 1 & !is.null(cut_fmt)) {
+  if ((length(c(...)) > 1 | !is.numeric(x[, get(c(...)[[1]])])) & !is.null(cut_fmt)) {
     stop("cut_fmt is only defined for a single numeric column")
   }
 
@@ -52,7 +52,7 @@ freq_table <- function(x,
                                                             by = 0.1),
                                                 na.rm = TRUE), Inf)))]
   } else {
-    stop("cut_fmt is an invalid function")
+    stop(sprintf("%s, is an invalid function", cut_fmt))
   }
 
   x <- x[, .("Frequency" = .N, "Percent" = .N/nrow(x)), by = c(...)]

@@ -1,14 +1,18 @@
 Package: report.tools
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Tools to help create analytic reports
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: James Inlow <james.d.inlow@gmail.com>
+Maintainer: James Inlow <james.d.inlow@gmail.com>
+Description: This package provides tools to help with quickly creating
+    reproducible analytic reports. The functions in the package creates
+    many common tables needed for analytic reports, as well as ways to 
+    quickly output them to excel (a common analytic workflow).
+License: MIT
 Encoding: UTF-8
 LazyData: true
 Imports:
-  data.table
+  data.table (>= 1.12.0),
+  openxlsx (>= 4.1.0),
+  knitr
 RoxygenNote: 6.1.1
