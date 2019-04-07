@@ -72,5 +72,6 @@ freq_table <- function(x,
   # Add cumulative functions
   x[, `Cumulative Frequency` := cumsum(Frequency)]
   x[, `Cumulative Percent` := cumsum(Percent)]
+  class(x) <- c("report.table", class(x))
   x[]
 }
