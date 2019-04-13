@@ -55,7 +55,7 @@ freq_table <- function(x,
                                                             by = 0.1),
                                                 na.rm = TRUE), Inf)))]
   } else {
-    stop(sprintf("%s, is an invalid function for cut_fmt", cut_fmt))
+    stop(cut_fmt, " is an invalid function for cut_fmt")
   }
 
   x <- x[, .("Frequency" = .N, "Percent" = .N/nrow(x)), by = c(...)]
