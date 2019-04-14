@@ -7,7 +7,9 @@ table_output <- function(x,
                          header_style = NULL,
                          fmt_side = TRUE,
                          pct_keys = "percent|pct|%|rate",
-                         keep_na = FALSE) {
+                         keep_na = FALSE,
+                         auto_col_width = TRUE,
+                         cond_fmt_cols = NULL) {
   # Set defaul styles
   if (is.null(header_style)) {
     header_style <- openxlsx::createStyle(fgFill = "#4F81BD",
@@ -39,7 +41,8 @@ table_output <- function(x,
                        cols = (pct_cols + (start_col - 1)),
                        gridExpand = TRUE)
   }
-
+  # The same style as applied to the header can be applied to the side
+  # of the table
   if (fmt_side) {
     openxlsx::addStyle(wb = wb,
                        sheet = sheet,
@@ -47,6 +50,20 @@ table_output <- function(x,
                        rows = start_row:(nrow(x) + start_row),
                        cols = start_col,
                        gridExpand = TRUE)
+  }
+  # Set column widths automatically.
+  if (auto_col_width) {
+    openxlsx::setColWidths(wb, sheet = sheet, cols = start_col:(ncol(x) + start_col), widths = "auto")
+  }
+  # Conditional Formatting
+  if (!is.null(cond_fmt_cols)) {
+    purrr::walk(cond_fmt_cols, ~
+                  openxlsx::conditionalFormatting(wb,
+                                                  sheet,
+                                                  cols = ((start_col-1) + .),
+                                                  rows = (start_row:(nrow(x) + start_row + 1)),
+                                                  type = 'colorScale',
+                                                  style = c("#C6EFCE", "#FFEB9C", "#FFC7CE")))
   }
 }
 
@@ -74,6 +91,10 @@ table_output <- function(x,
 #'   automatically formatted as percents when the table is output to excel.
 #'   Setting this function to \code{NULL} will result in no columns being
 #'   formatted as percents. Default is set to \code{"percent|pct|\%|rate"}.
+#' @param auto_col_width automattically set column widths of the tables being
+#'   output.
+#' @param cond_fmt_cols columns of the tables to apply conditional formatting
+#'    to.
 #' @param keep_na if set to \code{FALSE} cells that contain \code{NA} will be
 #'   left blank in the excel document. Otherwise "NA" will be written out as
 #'   a string in excel. Default is \code{FALSE}.
@@ -90,6 +111,8 @@ output_to_excel <- function(x,
                     fmt_side = TRUE,
                     open_wb = TRUE,
                     pct_keys = "percent|pct|%|rate",
+                    auto_col_width = TRUE,
+                    cond_fmt_cols = NULL,
                     keep_na = FALSE,
                     rows_btwn = 2) {
   # If no wb object provided create one, the decision needs to be made
@@ -101,6 +124,9 @@ output_to_excel <- function(x,
   if (is.null(sheet)) {
     ob_n <- substitute(x)
     sheet <- deparse(ob_n)
+
+    # Check for the values that cannot exist in an excel worksheet name.
+    sheet <- gsub(pattern = "\\*|\\?|\\]|\\[|:", replacement = "", x = sheet)
     # Check if sheetname already exists in workbook. If it does
     # append 2 onto it.
     if (sheet %in% wb$sheet_names) {
@@ -111,7 +137,7 @@ output_to_excel <- function(x,
 
   if (any(class(x) %in% c("report.tools", "data.frame", "matrix"))) {
     table_output(x, wb, sheet, start_row, start_col,
-                 header_style, fmt_side, pct_keys, keep_na)
+                 header_style, fmt_side, pct_keys, keep_na, auto_col_width, cond_fmt_cols)
   } else if (is.list(x)) {
     if (!list_ddm(x)) {
       stop("Elements of must be of class data.frame, data.table, or matrix")
@@ -125,7 +151,9 @@ output_to_excel <- function(x,
                    header_style,
                    fmt_side,
                    pct_keys,
-                   keep_na)
+                   keep_na,
+                   auto_col_width,
+                   cond_fmt_cols)
       start_row <- (start_row + (nrow(x[[i]]) + (rows_btwn+1)))
     }
   }

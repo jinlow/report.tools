@@ -6,7 +6,8 @@
 \usage{
 output_to_excel(x, wb = NULL, sheet = NULL, start_row = 1,
   start_col = 1, header_style = NULL, fmt_side = TRUE,
-  open_wb = TRUE, pct_keys = "percent|pct|\%|rate", keep_na = FALSE,
+  open_wb = TRUE, pct_keys = "percent|pct|\%|rate",
+  auto_col_width = TRUE, cond_fmt_cols = NULL, keep_na = FALSE,
   rows_btwn = 2)
 }
 \arguments{
@@ -37,6 +38,12 @@ written.}
 automatically formatted as percents when the table is output to excel.
 Setting this function to \code{NULL} will result in no columns being
 formatted as percents. Default is set to \code{"percent|pct|\%|rate"}.}
+
+\item{auto_col_width}{automattically set column widths of the tables being
+output.}
+
+\item{cond_fmt_cols}{columns of the tables to apply conditional formatting
+to.}
 
 \item{keep_na}{if set to \code{FALSE} cells that contain \code{NA} will be
 left blank in the excel document. Otherwise "NA" will be written out as
