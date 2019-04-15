@@ -60,7 +60,7 @@ table_output <- function(x,
     purrr::walk(cond_fmt_cols, ~
                   openxlsx::conditionalFormatting(wb,
                                                   sheet,
-                                                  cols = ((start_col-1) + .),
+                                                  cols = ((start_col-1) + .x),
                                                   rows = (start_row:(nrow(x) + start_row + 1)),
                                                   type = 'colorScale',
                                                   style = c("#C6EFCE", "#FFEB9C", "#FFC7CE")))
@@ -136,17 +136,26 @@ output_to_excel <- function(x,
   }
 
   if (any(class(x) %in% c("report.tools", "data.frame", "matrix"))) {
-    table_output(x, wb, sheet, start_row, start_col,
-                 header_style, fmt_side, pct_keys, keep_na, auto_col_width, cond_fmt_cols)
+    table_output(x,
+                 wb,
+                 sheet,
+                 start_row,
+                 start_col,
+                 header_style,
+                 fmt_side,
+                 pct_keys,
+                 keep_na,
+                 auto_col_width,
+                 cond_fmt_cols)
   } else if (is.list(x)) {
     if (!list_ddm(x)) {
-      stop("Elements of must be of class data.frame, data.table, or matrix")
+      stop("Elements of x must be of class data.frame, data.table, or matrix")
     }
-    for (i in seq_len(length(x))) {
-      table_output(x[[i]],
+    purrr::walk(x, ~ {
+      table_output(.x,
                    wb,
                    sheet,
-                   start_row = start_row,
+                   start_row,
                    start_col,
                    header_style,
                    fmt_side,
@@ -154,8 +163,9 @@ output_to_excel <- function(x,
                    keep_na,
                    auto_col_width,
                    cond_fmt_cols)
-      start_row <- (start_row + (nrow(x[[i]]) + (rows_btwn+1)))
-    }
+      # Update start_row in the parent enviroment.
+      start_row <<- (start_row + (nrow(.x) + (rows_btwn + 1)))
+    })
   }
 
   if (open_wb) {

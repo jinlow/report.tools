@@ -6,8 +6,7 @@ NULL
 
 # Check object type
 list_ddm <- function(x) {
-  types <- unique(lapply(x, class)) %>%
-    unlist()
+  types <- unique(purrr::map_chr(x, class))
   all(types %in% c("report.table", "matrix", "data.table", "data.frame"))
 }
 
