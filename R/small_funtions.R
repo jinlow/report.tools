@@ -3,8 +3,7 @@
 #' @export
 formatted_table <- function(x, ...) {
   stopifnot(inherits(x,"data.frame"))
-  v_nms <- substitute(c(...))[-1]
-  v_nms <- vapply(v_nms, deparse, FUN.VALUE = character(1))
+  v_nms <- c(...)
   if (inherits(x,  "data.table")) {
     vars <- x[, (v_nms), with = FALSE]
   } else {

@@ -26,10 +26,9 @@ freq_table <- function(x,
                        cut_fmt = NULL,
                        na_last = FALSE,
                        decreasing = FALSE) {
-  if (!is.data.frame(x)) {
-    stop("Input x must be of type data.table or data.frame")
-  }
-  if (!("data.table" %in% class(x))) {
+  stopifnot(inherits(x, c("data.frame", "data.frame")))
+
+  if (!inherits(x, "data.table")) {
     x <- as.data.table(x[,c(...), drop = FALSE])
   } else {
     freq_cols <- c(...)
