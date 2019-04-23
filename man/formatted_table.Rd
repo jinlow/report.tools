@@ -2,10 +2,37 @@
 % Please edit documentation in R/small_funtions.R
 \name{formatted_table}
 \alias{formatted_table}
-\title{Formatted Table}
+\title{Simple Cross Table}
 \usage{
-formatted_table(x, ...)
+formatted_table(x, ..., var_names = NULL, cross_symbol = " X ")
+}
+\arguments{
+\item{x}{a \code{data.frame} from which to get the columns for
+calculating the table.}
+
+\item{...}{one or two columns to use to calculate a simple table, or
+cross table. Enter the names unquoted.}
+
+\item{var_names}{custom variable names may be specified and will be used
+in the table title. Default \code{NULL}.}
+
+\item{cross_symbol}{symbol to use in the table title to signify the cross
+of two variables. Default is " X ".}
 }
 \description{
-Formatted Table
+Create a table similar to the \code{base} \code{R} function
+\code{\link[base]{table}}, but instead with formatted column
+names and as a \code{data.table} so that it can easily be
+manipulated or put into an analysis.
+}
+\examples{
+# Create a cross table of cyl and vs
+formatted_table(mtcars, cyl, vs)
+
+# Add custom names using the var_names parameter
+formatted_table(mtcars, cyl, vs, var_names = c("Cylinders", "Engine"))
+
+# Add a custom by option
+formatted_table(mtcars, cyl, vs, cross_symbol = " by ")
+
 }

@@ -74,9 +74,11 @@ table_output <- function(x,
 #'
 #' @param x an list of or single object of class \code{data.frame}, \code{data.table}
 #'   , \code{matrix} or \code{report.table} to write out to excel.
-#' @param wb a workbook object created with \code{openxlsx::createWorkbook()}.
+#' @param wb a workbook object created with \code{\link[openxlsx]{createWorkbook}}
+#'   using code such as \code{openxlsx::createWorkbook()}.
 #'   If no workbook object is set one will be created in the function.
 #' @param sheet the name of a sheet created in the workbook object created using
+#'   function \code{\link[openxlsx]{addWorksheet}} using code such as
 #'   \code{openxlsx::addWorksheet(wb = wb, sheetName = <name of x>)}, where the
 #'   name of the sheet will be the name of the object passed into x
 #' @param start_row the row to start writing the table or list of tables to.
