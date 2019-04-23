@@ -40,7 +40,7 @@ formatted_table <- function(x, ..., var_names = NULL, cross_symbol = " X ") {
     tab <- as.data.frame.table(table(unlist(.dat)))
     data.table::setDT(tab)
     names(tab)[[1]] <- nms
-  } else if (length(.dat) > 1) {
+  } else if (length(.dat) == 2) {
     tab <- as.data.frame.matrix(table(.dat))
     nms <- paste(nms, collapse = cross_symbol)
     data.table::setDT(tab, keep.rownames = nms)
