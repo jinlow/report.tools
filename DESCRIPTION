@@ -17,6 +17,5 @@ Imports:
   data.table (>= 1.12.0),
   openxlsx (>= 4.1.0),
   knitr (>= 1.21),
-  purrr (>= 0.3.2),
-  rlang (>= 0.3.1)
+  purrr (>= 0.3.2)
 RoxygenNote: 6.1.1

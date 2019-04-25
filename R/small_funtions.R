@@ -27,15 +27,19 @@
 #' # Add a custom by option
 #' formatted_table(mtcars, cyl, vs, cross_symbol = " by ")
 #'
+#' # Allows for functions to be used directly as variable inputs.
+#' formatted_table(mtcars, cyl > 6, vs, var_names = c("cyl > 6", "vs"))
+#'
 #' @export
 formatted_table <- function(x, ..., var_names = NULL, cross_symbol = " X ") {
   if (is.null(var_names)) {
-    nms <- sapply(substitute(list(...))[-1], deparse)
+    nms <- vapply(substitute(list(...))[-1], deparse, FUN.VALUE = character(1))
   } else {
     nms <- var_names
   }
   # Get columns from data enviroment
-  .dat <- lapply(rlang::enquos(...), function(v) rlang::eval_tidy(v, x))
+  sub_obj <- as.list(substitute(list(...)))[-1L]
+  .dat <- lapply(sub_obj, eval, envir = x, enclos = parent.frame())
   if (length(.dat) == 1) {
     tab <- as.data.frame.table(table(unlist(.dat)))
     data.table::setDT(tab)

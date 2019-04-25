@@ -35,4 +35,7 @@ formatted_table(mtcars, cyl, vs, var_names = c("Cylinders", "Engine"))
 # Add a custom by option
 formatted_table(mtcars, cyl, vs, cross_symbol = " by ")
 
+# Allows for functions to be used directly as variable inputs.
+formatted_table(mtcars, cyl > 6, vs, var_names = c("cyl > 6", "vs"))
+
 }
