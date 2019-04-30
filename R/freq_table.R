@@ -26,7 +26,7 @@ freq_table <- function(x,
                        cut_fmt = NULL,
                        na_last = FALSE,
                        decreasing = FALSE) {
-  stopifnot(inherits(x, c("data.frame", "data.frame")))
+  stopifnot(inherits(x, "data.frame"))
 
   if (!inherits(x, "data.table")) {
     x <- as.data.table(x[,c(...), drop = FALSE])
@@ -45,14 +45,16 @@ freq_table <- function(x,
     x[, (...) := cut_fmt(get(...))]
   } else if (cut_fmt == "quantile") {
     x[, (...) := cut(get(...),
-                     breaks = c(unique(quantile(get(...), na.rm = TRUE), Inf)))]
+                     breaks = c(unique(quantile(get(...), na.rm = TRUE), Inf)),
+                     include.lowest = TRUE)]
   } else if (cut_fmt == "decile") {
     x[, (...) := cut(get(...),
                      breaks = c(unique(quantile(get(...),
                                                 probs = seq(from = 0,
                                                             to = 1,
                                                             by = 0.1),
-                                                na.rm = TRUE), Inf)))]
+                                                na.rm = TRUE), Inf)),
+                     include.lowest = TRUE)]
   } else {
     stop(cut_fmt, " is an invalid function for cut_fmt")
   }

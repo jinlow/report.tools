@@ -14,7 +14,7 @@ list_ddm <- function(x) {
 #' S3 print method for objects of class report.table
 #' @export
 print.report.table <- function(x, ...) {
-  w_pct <- grep(pattern = "percent", x = names(x), ignore.case = T)
+  w_pct <- grep(pattern = "percent|pct", x = names(x), ignore.case = T)
   xp <- as.data.frame(x)
   xp[,(w_pct)] <- lapply(xp[,(w_pct)] , function(v) {sprintf("%.2f%%", 100*as.numeric(v))})
   print(knitr::kable(xp[], align = ))
