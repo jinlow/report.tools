@@ -38,26 +38,8 @@ freq_table <- function(x,
     stop("cut_fmt is only defined for a single numeric column")
   }
 
-  # Check for user defined functions
-  if (is.null(cut_fmt)) {
-    NULL
-  } else if (is.function(cut_fmt)) {
-    x[, (...) := cut_fmt(get(...))]
-  } else if (cut_fmt == "quantile") {
-    x[, (...) := cut(get(...),
-                     breaks = c(unique(quantile(get(...), na.rm = TRUE), Inf)),
-                     include.lowest = TRUE)]
-  } else if (cut_fmt == "decile") {
-    x[, (...) := cut(get(...),
-                     breaks = c(unique(quantile(get(...),
-                                                probs = seq(from = 0,
-                                                            to = 1,
-                                                            by = 0.1),
-                                                na.rm = TRUE), Inf)),
-                     include.lowest = TRUE)]
-  } else {
-    stop(cut_fmt, " is an invalid function for cut_fmt")
-  }
+  # Check for user defined functions and apply cut_fmt to ...
+  fmt_cut_fnc_(x, ..., cut_fmt = cut_fmt)
 
   x <- x[, .("Frequency" = .N, "Percent" = .N/nrow(x)), by = c(...)]
 
