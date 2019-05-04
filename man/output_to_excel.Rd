@@ -8,7 +8,7 @@ output_to_excel(x, wb = NULL, sheet = NULL, start_row = 1,
   start_col = 1, header_style = NULL, fmt_side = TRUE,
   open_wb = TRUE, pct_keys = "percent|pct|\%|rate",
   auto_col_width = TRUE, cond_fmt_cols = NULL, keep_na = FALSE,
-  rows_btwn = 2)
+  rows_btwn = 2, verbose = TRUE)
 }
 \arguments{
 \item{x}{an list of or single object of class \code{data.frame}, \code{data.table}
@@ -53,6 +53,9 @@ a string in excel. Default is \code{FALSE}.}
 
 \item{rows_btwn}{if \code{x} is a list of tables the number if rows
 to place between tables.}
+
+\item{verbose}{if \code{TRUE} print the progress of the table output.
+Default is set to \code{TRUE}.}
 }
 \description{
 Write out data in table format easily to excel

@@ -102,6 +102,8 @@ table_output <- function(x,
 #'   a string in excel. Default is \code{FALSE}.
 #' @param rows_btwn if \code{x} is a list of tables the number if rows
 #'   to place between tables.
+#' @param verbose if \code{TRUE} print the progress of the table output.
+#'   Default is set to \code{TRUE}.
 #'
 #' @export
 output_to_excel <- function(x,
@@ -116,7 +118,8 @@ output_to_excel <- function(x,
                     auto_col_width = TRUE,
                     cond_fmt_cols = NULL,
                     keep_na = FALSE,
-                    rows_btwn = 2) {
+                    rows_btwn = 2,
+                    verbose = TRUE) {
   # If no wb object provided create one, the decision needs to be made
   # of how the created workbook should be returned...
   if (is.null(wb)) {
@@ -126,6 +129,9 @@ output_to_excel <- function(x,
   if (is.null(sheet)) {
     ob_n <- substitute(x)
     sheet <- deparse(ob_n)
+    if (nchar(sheet) > 31) {
+      sheet <- paste0(substring(sheet, 1, 28), "...")
+    }
 
     # Check for the values that cannot exist in an excel worksheet name.
     sheet <- gsub(pattern = "\\*|\\?|\\]|\\[|:", replacement = "", x = sheet)
@@ -153,8 +159,17 @@ output_to_excel <- function(x,
     if (!list_ddm(x)) {
       stop("Elements of x must be of class data.frame, data.table, or matrix")
     }
-    purrr::walk(x, ~ {
-      table_output(.x,
+
+    # Table Names
+    if (is.null(names(x))) {
+      l_names <- paste0("table ", seq_len(length(x)))
+    } else {
+      l_names <- names(x)
+    }
+
+    # Write out tables
+    for (i in seq_len(length(x))) {
+      table_output(x[[i]],
                    wb,
                    sheet,
                    start_row,
@@ -165,9 +180,15 @@ output_to_excel <- function(x,
                    keep_na,
                    auto_col_width,
                    cond_fmt_cols)
+
+      if (verbose == TRUE) {
+        # Progress bar
+        progr <- paste(rep("=", (20*i/length(x))), collapse="")
+        cat(sprintf("\r%s : %-20s| %-50s", "Writting", progr, l_names[[i]]))
+      }
       # Update start_row in the parent enviroment.
-      start_row <<- (start_row + (nrow(.x) + (rows_btwn + 1)))
-    })
+      start_row <- (start_row + (nrow(x[[i]]) + (rows_btwn + 1)))
+    }
   }
 
   if (open_wb) {

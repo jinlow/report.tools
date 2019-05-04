@@ -6,7 +6,7 @@ NULL
 
 # Check object type
 list_ddm <- function(x) {
-  types <- unique(purrr::map_chr(x, class))
+  types <- unique(unlist(lapply(x, class)))
   all(types %in% c("report.table", "matrix", "data.table", "data.frame"))
 }
 
@@ -24,6 +24,11 @@ print.report.table <- function(x, ...) {
 # x is a data.table in the function, ... is the
 # variable to perform the cut on.
 fmt_cut_fnc_ <- function(x, ..., cut_fmt = NULL) {
+  # Error handling in function
+  e_opt <- getOption("error")
+  on.exit(options(error = e_opt))
+  options(error = NULL)
+
   vars <- c(...)
   if (is.null(cut_fmt)) {
     NULL
