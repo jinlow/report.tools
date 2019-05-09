@@ -4,8 +4,8 @@
 \alias{bivar_table}
 \title{Bivariate Table}
 \usage{
-bivar_table(x, var, bivar, cut_fmt = NULL, na_last = FALSE,
-  decreasing = FALSE)
+bivar_table(x, var, bivar, extra_vars = NULL, cut_fmt = NULL,
+  na_last = FALSE, decreasing = FALSE)
 }
 \arguments{
 \item{x}{a \code{data.frame} or \code{data.table} object.}
@@ -14,6 +14,8 @@ bivar_table(x, var, bivar, cut_fmt = NULL, na_last = FALSE,
 be used, or binned levels if a \code{cut_fmt} is chosen.}
 
 \item{bivar}{a binary performance vector to destribute along \code{var}}
+
+\item{extra_vars}{extra binary variables to distribute in addition to the \code{bivar}.}
 
 \item{cut_fmt}{a function used to cut a numeric column into descrete levels
 to use in the table.
@@ -40,4 +42,15 @@ Create a table that shows how a binary field distributes along another
 discrete variable. Supports all unique values in a variable, custom cut
 functions, or has a limited number of created helper cut functions for
 continious variables.
+}
+\examples{
+# Create a bivariate of vs by cyl
+bivar_table(x = mtcars, var = "cyl", bivar = "vs")
+
+# add extra variable am
+bivar_table(x = mtcars, var = "cyl", bivar = "vs", extra_vars = "am")
+
+# Use custom predifined cut function
+bivar_table(x = mtcars, var = "mpg", bivar = "vs", extra_vars = "am", cut_fmt = "quantile")
+
 }

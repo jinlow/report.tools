@@ -12,11 +12,12 @@ table_output <- function(x,
                          cond_fmt_cols = NULL) {
   # Set defaul styles
   if (is.null(header_style)) {
-    header_style <- openxlsx::createStyle(fgFill = "#4F81BD",
+    header_style <- openxlsx::createStyle(fgFill = "#d3daea",
                                           halign = "CENTER",
                                           textDecoration = "Bold",
-                                          border = "Bottom",
-                                          fontColour = "white")
+                                          border = "TopBottomLeftRight",
+                                          borderColour = "black",
+                                          fontColour = "black")
   }
 
   # Write out base table
@@ -107,19 +108,19 @@ table_output <- function(x,
 #'
 #' @export
 output_to_excel <- function(x,
-                    wb = NULL,
-                    sheet = NULL,
-                    start_row = 1,
-                    start_col = 1,
-                    header_style = NULL,
-                    fmt_side = TRUE,
-                    open_wb = TRUE,
-                    pct_keys = "percent|pct|%|rate",
-                    auto_col_width = TRUE,
-                    cond_fmt_cols = NULL,
-                    keep_na = FALSE,
-                    rows_btwn = 2,
-                    verbose = TRUE) {
+                            wb = NULL,
+                            sheet = NULL,
+                            start_row = 1,
+                            start_col = 1,
+                            header_style = NULL,
+                            fmt_side = TRUE,
+                            open_wb = TRUE,
+                            pct_keys = "percent|pct|%|rate",
+                            auto_col_width = TRUE,
+                            cond_fmt_cols = NULL,
+                            keep_na = FALSE,
+                            rows_btwn = 2,
+                            verbose = TRUE) {
   # If no wb object provided create one, the decision needs to be made
   # of how the created workbook should be returned...
   if (is.null(wb)) {
@@ -140,7 +141,7 @@ output_to_excel <- function(x,
     if (sheet %in% wb$sheet_names) {
       sheet <- paste0(sheet, "(2)")
     }
-    openxlsx::addWorksheet(wb = wb, sheetName = sheet)
+    openxlsx::addWorksheet(wb = wb, sheetName = sheet, gridLines = FALSE)
   }
 
   if (any(class(x) %in% c("report.tools", "data.frame", "matrix"))) {
@@ -192,6 +193,10 @@ output_to_excel <- function(x,
   }
 
   if (open_wb) {
+    if (verbose == TRUE) {
+      cat("\n")
+      cat("Opening Workbook \n")
+    }
     openxlsx::openXL(wb)
   }
 }
