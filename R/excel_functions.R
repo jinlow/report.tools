@@ -1,75 +1,3 @@
-# Internal function for writing tables to excel
-table_output <- function(x,
-                         wb = NULL,
-                         sheet = NULL,
-                         start_row = 1,
-                         start_col = 1,
-                         header_style = NULL,
-                         header_color,
-                         fmt_side = TRUE,
-                         pct_keys = "percent|pct|%|rate",
-                         keep_na = FALSE,
-                         auto_col_width = TRUE,
-                         cond_fmt_cols = NULL) {
-  # Set defaul styles
-  if (is.null(header_style)) {
-    header_style <- openxlsx::createStyle(fgFill = header_color,
-                                          halign = "CENTER",
-                                          textDecoration = "Bold",
-                                          border = "TopBottomLeftRight",
-                                          borderColour = "black",
-                                          fontColour = "black")
-  }
-
-  # Write out base table
-  openxlsx::writeData(wb = wb,
-                      sheet = sheet,
-                      x = x,
-                      startCol = start_col,
-                      startRow = start_row,
-                      borders = "all",
-                      headerStyle = header_style,
-                      keepNA = FALSE)
-
-  # Format percent columns
-  if (!is.null(pct_keys)) {
-    pct_style <- openxlsx::createStyle(numFmt = "PERCENTAGE",
-                                       border = "TopBottomLeftRight")
-    pct_cols <- grep(pattern = pct_keys, x = names(x), ignore.case = TRUE)
-    openxlsx::addStyle(wb = wb,
-                       sheet = sheet,
-                       style = pct_style,
-                       rows = (start_row + 1):(nrow(x) + start_row),
-                       cols = (pct_cols + (start_col - 1)),
-                       gridExpand = TRUE)
-  }
-  # The same style as applied to the header can be applied to the side
-  # of the table
-  if (fmt_side) {
-    openxlsx::addStyle(wb = wb,
-                       sheet = sheet,
-                       style = header_style,
-                       rows = start_row:(nrow(x) + start_row),
-                       cols = start_col,
-                       gridExpand = TRUE)
-  }
-  # Set column widths automatically.
-  if (auto_col_width) {
-    openxlsx::setColWidths(wb, sheet = sheet, cols = start_col:(ncol(x) + start_col), widths = "auto")
-  }
-  # Conditional Formatting
-  if (!is.null(cond_fmt_cols)) {
-    purrr::walk(cond_fmt_cols, ~
-                  openxlsx::conditionalFormatting(wb,
-                                                  sheet,
-                                                  cols = ((start_col-1) + .x),
-                                                  rows = (start_row:(nrow(x) + start_row + 1)),
-                                                  type = 'colorScale',
-                                                  style = c("#C6EFCE", "#FFEB9C", "#FFC7CE")))
-  }
-}
-
-
 #' Tables to excel
 #'
 #'    Write out data in table format easily to excel
@@ -87,6 +15,8 @@ table_output <- function(x,
 #' @param start_col the column to start writing the table or list of tables to.
 #' @param header_style a style created using \code{openxlsx::createStyle} to apply to
 #'   the header of the table
+#' @param header_color a color to use for the header background color. Ignored if
+#'   \code{header_style} is set.
 #' @param fmt_side if \code{header_side} should also be applied to the first columns
 #'   of the table of list of tables be output. Default is set to \code{TRUE}.
 #' @param open_wb if the workbook object should be opened after the table has been
@@ -213,5 +143,76 @@ output_to_excel <- function(x,
       cat("Opening Workbook \n")
     }
     openxlsx::openXL(wb)
+  }
+}
+
+# Internal function for writing tables to excel
+table_output <- function(x,
+                         wb = NULL,
+                         sheet = NULL,
+                         start_row = 1,
+                         start_col = 1,
+                         header_style = NULL,
+                         header_color,
+                         fmt_side = TRUE,
+                         pct_keys = "percent|pct|%|rate",
+                         keep_na = FALSE,
+                         auto_col_width = TRUE,
+                         cond_fmt_cols = NULL) {
+  # Set defaul styles
+  if (is.null(header_style)) {
+    header_style <- openxlsx::createStyle(fgFill = header_color,
+                                          halign = "CENTER",
+                                          textDecoration = "Bold",
+                                          border = "TopBottomLeftRight",
+                                          borderColour = "black",
+                                          fontColour = "black")
+  }
+
+  # Write out base table
+  openxlsx::writeData(wb = wb,
+                      sheet = sheet,
+                      x = x,
+                      startCol = start_col,
+                      startRow = start_row,
+                      borders = "all",
+                      headerStyle = header_style,
+                      keepNA = FALSE)
+
+  # Format percent columns
+  if (!is.null(pct_keys)) {
+    pct_style <- openxlsx::createStyle(numFmt = "PERCENTAGE",
+                                       border = "TopBottomLeftRight")
+    pct_cols <- grep(pattern = pct_keys, x = names(x), ignore.case = TRUE)
+    openxlsx::addStyle(wb = wb,
+                       sheet = sheet,
+                       style = pct_style,
+                       rows = (start_row + 1):(nrow(x) + start_row),
+                       cols = (pct_cols + (start_col - 1)),
+                       gridExpand = TRUE)
+  }
+  # The same style as applied to the header can be applied to the side
+  # of the table
+  if (fmt_side) {
+    openxlsx::addStyle(wb = wb,
+                       sheet = sheet,
+                       style = header_style,
+                       rows = start_row:(nrow(x) + start_row),
+                       cols = start_col,
+                       gridExpand = TRUE)
+  }
+  # Set column widths automatically.
+  if (auto_col_width) {
+    openxlsx::setColWidths(wb, sheet = sheet, cols = start_col:(ncol(x) + start_col), widths = "auto")
+  }
+  # Conditional Formatting
+  if (!is.null(cond_fmt_cols)) {
+    purrr::walk(cond_fmt_cols, ~
+                  openxlsx::conditionalFormatting(wb,
+                                                  sheet,
+                                                  cols = ((start_col-1) + .x),
+                                                  rows = (start_row:(nrow(x) + start_row + 1)),
+                                                  type = 'colorScale',
+                                                  style = c("#C6EFCE", "#FFEB9C", "#FFC7CE")))
   }
 }

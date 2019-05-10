@@ -5,8 +5,8 @@
 \title{Tables to excel}
 \usage{
 output_to_excel(x, wb = NULL, sheet = NULL, start_row = 1,
-  start_col = 1, header_style = NULL, fmt_side = TRUE,
-  open_wb = TRUE, pct_keys = "percent|pct|\%|rate",
+  start_col = 1, header_style = NULL, header_color = "#d3daea",
+  fmt_side = TRUE, open_wb = TRUE, pct_keys = "percent|pct|\%|rate",
   auto_col_width = TRUE, cond_fmt_cols = NULL, keep_na = FALSE,
   rows_btwn = 2, verbose = TRUE)
 }
@@ -29,6 +29,9 @@ name of the sheet will be the name of the object passed into x}
 
 \item{header_style}{a style created using \code{openxlsx::createStyle} to apply to
 the header of the table}
+
+\item{header_color}{a color to use for the header background color. Ignored if
+\code{header_style} is set.}
 
 \item{fmt_side}{if \code{header_side} should also be applied to the first columns
 of the table of list of tables be output. Default is set to \code{TRUE}.}
