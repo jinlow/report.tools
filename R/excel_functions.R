@@ -5,6 +5,7 @@ table_output <- function(x,
                          start_row = 1,
                          start_col = 1,
                          header_style = NULL,
+                         header_color,
                          fmt_side = TRUE,
                          pct_keys = "percent|pct|%|rate",
                          keep_na = FALSE,
@@ -12,7 +13,7 @@ table_output <- function(x,
                          cond_fmt_cols = NULL) {
   # Set defaul styles
   if (is.null(header_style)) {
-    header_style <- openxlsx::createStyle(fgFill = "#d3daea",
+    header_style <- openxlsx::createStyle(fgFill = header_color,
                                           halign = "CENTER",
                                           textDecoration = "Bold",
                                           border = "TopBottomLeftRight",
@@ -106,6 +107,17 @@ table_output <- function(x,
 #' @param verbose if \code{TRUE} print the progress of the table output.
 #'   Default is set to \code{TRUE}.
 #'
+#' @examples
+#' # Create a bivariate of vs by cyl
+#' tab1 <- bivar_table(x = mtcars, var = "cyl", bivar = "vs")
+#' tab2 <- bivar_table(x = mtcars, var = "gear", bivar = "vs")
+#'
+#' # output a single table
+#' output_to_excel(tab1)
+#'
+#' # output a list of tables
+#' output_to_excel(list(tab1, tab2, tab1, tab2))
+#'
 #' @export
 output_to_excel <- function(x,
                             wb = NULL,
@@ -113,6 +125,7 @@ output_to_excel <- function(x,
                             start_row = 1,
                             start_col = 1,
                             header_style = NULL,
+                            header_color = "#d3daea",
                             fmt_side = TRUE,
                             open_wb = TRUE,
                             pct_keys = "percent|pct|%|rate",
@@ -151,6 +164,7 @@ output_to_excel <- function(x,
                  start_row,
                  start_col,
                  header_style,
+                 header_color,
                  fmt_side,
                  pct_keys,
                  keep_na,
@@ -176,6 +190,7 @@ output_to_excel <- function(x,
                    start_row,
                    start_col,
                    header_style,
+                   header_color,
                    fmt_side,
                    pct_keys,
                    keep_na,
@@ -185,7 +200,7 @@ output_to_excel <- function(x,
       if (verbose == TRUE) {
         # Progress bar
         progr <- paste(rep("=", (20*i/length(x))), collapse="")
-        cat(sprintf("\r%s : %-20s| %-50s", "Writting", progr, l_names[[i]]))
+        cat(sprintf("\r%s : %-20s| %-50s", "Writing", progr, l_names[[i]]))
       }
       # Update start_row in the parent enviroment.
       start_row <- (start_row + (nrow(x[[i]]) + (rows_btwn + 1)))

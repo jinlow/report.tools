@@ -60,3 +60,15 @@ Default is set to \code{TRUE}.}
 \description{
 Write out data in table format easily to excel
 }
+\examples{
+# Create a bivariate of vs by cyl
+tab1 <- bivar_table(x = mtcars, var = "cyl", bivar = "vs")
+tab2 <- bivar_table(x = mtcars, var = "gear", bivar = "vs")
+
+# output a single table
+output_to_excel(tab1)
+
+# output a list of tables
+output_to_excel(list(tab1, tab2, tab1, tab2))
+
+}
