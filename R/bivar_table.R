@@ -68,7 +68,6 @@ bivar_table <- function(x,
     })
   }
 
-
   btab <- x[, .("N" = .N,
                 "Pct N" = .N/nrow(x),
                 "Sum_b" = sum(get(bivar)),

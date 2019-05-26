@@ -144,6 +144,7 @@ output_to_excel <- function(x,
     }
     openxlsx::openXL(wb)
   }
+  invisible(wb)
 }
 
 # Internal function for writing tables to excel
@@ -207,12 +208,13 @@ table_output <- function(x,
   }
   # Conditional Formatting
   if (!is.null(cond_fmt_cols)) {
-    purrr::walk(cond_fmt_cols, ~
-                  openxlsx::conditionalFormatting(wb,
-                                                  sheet,
-                                                  cols = ((start_col-1) + .x),
-                                                  rows = (start_row:(nrow(x) + start_row + 1)),
-                                                  type = 'colorScale',
-                                                  style = c("#C6EFCE", "#FFEB9C", "#FFC7CE")))
+    invisible_lapply (cond_fmt_cols, function(.x) {
+                        openxlsx::conditionalFormatting(wb,
+                                                        sheet,
+                                                        cols = ((start_col-1) + .x),
+                                                        rows = (start_row:(nrow(x) + start_row + 1)),
+                                                        type = 'colorScale',
+                                                        style = c("#70c66f", "#ffe88c", "#ff6376"))})
   }
+  invisible(wb)
 }

@@ -10,6 +10,12 @@ list_ddm <- function(x) {
   all(types %in% c("report.table", "matrix", "data.table", "data.frame"))
 }
 
+# Lapply for side effects
+invisible_lapply <- function(X, FUN, ...) {
+  X <- lapply(X, FUN, ...)
+  invisible(X)
+}
+
 #' Print report.table
 #' S3 print method for objects of class report.table
 #' @export
