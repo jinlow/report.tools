@@ -49,117 +49,32 @@
 #' output_to_excel(list(tab1, tab2, tab1, tab2))
 #'
 #' @export
-output_to_excel <- function(x,
-                            wb = NULL,
-                            sheet = NULL,
-                            start_row = 1,
-                            start_col = 1,
-                            header_style = NULL,
-                            header_color = "#d3daea",
-                            fmt_side = TRUE,
-                            open_wb = TRUE,
-                            pct_keys = "percent|pct|%|rate",
-                            auto_col_width = TRUE,
-                            cond_fmt_cols = NULL,
-                            keep_na = FALSE,
-                            rows_btwn = 2,
-                            verbose = TRUE) {
-  # If no wb object provided create one, the decision needs to be made
-  # of how the created workbook should be returned...
-  if (is.null(wb)) {
-    wb <- openxlsx::createWorkbook()
-  }
-
-  if (is.null(sheet)) {
-    ob_n <- substitute(x)
-    sheet <- deparse(ob_n)
-    if (nchar(sheet) > 31) {
-      sheet <- paste0(substring(sheet, 1, 28), "...")
-    }
-
-    # Check for the values that cannot exist in an excel worksheet name.
-    sheet <- gsub(pattern = "\\*|\\?|\\]|\\[|:", replacement = "", x = sheet)
-    # Check if sheetname already exists in workbook. If it does
-    # append 2 onto it.
-    if (sheet %in% wb$sheet_names) {
-      sheet <- paste0(sheet, "(2)")
-    }
-    openxlsx::addWorksheet(wb = wb, sheetName = sheet, gridLines = FALSE)
-  }
-
-  if (any(class(x) %in% c("report.tools", "data.frame", "matrix"))) {
-    table_output(x,
-                 wb,
-                 sheet,
-                 start_row,
-                 start_col,
-                 header_style,
-                 header_color,
-                 fmt_side,
-                 pct_keys,
-                 keep_na,
-                 auto_col_width,
-                 cond_fmt_cols)
-  } else if (is.list(x)) {
-    if (!list_ddm(x)) {
-      stop("Elements of x must be of class data.frame, data.table, or matrix")
-    }
-
-    # Table Names
-    if (is.null(names(x))) {
-      l_names <- paste0("table ", seq_len(length(x)))
-    } else {
-      l_names <- names(x)
-    }
-
-    # Write out tables
-    for (i in seq_len(length(x))) {
-      table_output(x[[i]],
-                   wb,
-                   sheet,
-                   start_row,
-                   start_col,
-                   header_style,
-                   header_color,
-                   fmt_side,
-                   pct_keys,
-                   keep_na,
-                   auto_col_width,
-                   cond_fmt_cols)
-
-      if (verbose == TRUE) {
-        # Progress bar
-        progr <- paste(rep("=", (20*i/length(x))), collapse="")
-        cat(sprintf("\r%s : %-20s| %-50s", "Writing", progr, l_names[[i]]))
-      }
-      # Update start_row in the parent enviroment.
-      start_row <- (start_row + (nrow(x[[i]]) + (rows_btwn + 1)))
-    }
-  }
-
-  if (open_wb) {
-    if (verbose == TRUE) {
-      cat("\n")
-      cat("Opening Workbook \n")
-    }
-    openxlsx::openXL(wb)
-  }
-  invisible(wb)
+output_to_xl <- function(x, ...) {
+  UseMethod("output_to_xl")
 }
 
-# Internal function for writing tables to excel
-table_output <- function(x,
-                         wb = NULL,
-                         sheet = NULL,
-                         start_row = 1,
-                         start_col = 1,
-                         header_style = NULL,
-                         header_color,
-                         fmt_side = TRUE,
-                         pct_keys = "percent|pct|%|rate",
-                         keep_na = FALSE,
-                         auto_col_width = TRUE,
-                         cond_fmt_cols = NULL) {
+#' Output an object of class data.frame to excel
+#' @export
+output_to_xl.data.frame <- function(x,
+                                    wb = NULL,
+                                    sheet = NULL,
+                                    start_row = 1,
+                                    start_col = 1,
+                                    header_style = NULL,
+                                    header_color = "#d3daea",
+                                    fmt_side = TRUE,
+                                    open_wb = TRUE,
+                                    pct_keys = "percent|pct|%|rate",
+                                    auto_col_width = TRUE,
+                                    cond_fmt_cols = NULL,
+                                    keep_na = FALSE,
+                                    verbose = TRUE) {
+  # If there is not workbook, create one.
+  if (is.null(wb)) wb <- openxlsx::createWorkbook()
+
+  # Add worksheet
+  sheet <- prep_sheet(x, wb, sheet)
+
   # Set defaul styles
   if (is.null(header_style)) {
     header_style <- openxlsx::createStyle(fgFill = header_color,
@@ -209,12 +124,115 @@ table_output <- function(x,
   # Conditional Formatting
   if (!is.null(cond_fmt_cols)) {
     invisible_lapply (cond_fmt_cols, function(.x) {
-                        openxlsx::conditionalFormatting(wb,
-                                                        sheet,
-                                                        cols = ((start_col-1) + .x),
-                                                        rows = (start_row:(nrow(x) + start_row + 1)),
-                                                        type = 'colorScale',
-                                                        style = c("#70c66f", "#ffe88c", "#ff6376"))})
+      openxlsx::conditionalFormatting(wb,
+                                      sheet,
+                                      cols = ((start_col-1) + .x),
+                                      rows = (start_row:(nrow(x) + start_row + 1)),
+                                      type = 'colorScale',
+                                      style = c("#70c66f", "#ffe88c", "#ff6376"))})
   }
+  # If user desires, open workbook
+  if (open_wb) {
+    if (verbose == TRUE) {
+      cat("\n")
+      cat("Opening Workbook \n")
+    }
+    openxlsx::openXL(wb)
+  }
+
   invisible(wb)
+}
+
+#' Output to excel for a list object
+#' @export
+output_to_xl.list <- function(x,
+                              wb = NULL,
+                              sheet = NULL,
+                              start_row = 1,
+                              start_col = 1,
+                              header_style = NULL,
+                              header_color = "#d3daea",
+                              fmt_side = TRUE,
+                              open_wb = TRUE,
+                              pct_keys = "percent|pct|%|rate",
+                              auto_col_width = TRUE,
+                              cond_fmt_cols = NULL,
+                              keep_na = FALSE,
+                              rows_btwn = 2,
+                              verbose = TRUE) {
+  if (!(all(vapply(x, function(v) any(class(v) == "data.frame"), FUN.VALUE = logical(1))))) {
+    stop("All elements of the x, must be a data.frame")
+  }
+
+  # If there is not workbook, create one.
+  if (is.null(wb)) wb <- openxlsx::createWorkbook()
+
+  # Add worksheet
+  sheet <- prep_sheet(x, wb, sheet)
+
+  # Table Names
+  if (is.null(names(x))) {
+    l_names <- paste0("table ", seq_len(length(x)))
+  } else {
+    l_names <- names(x)
+  }
+
+  # Write out tables
+  for (i in seq_len(length(x))) {
+    wb <- output_to_xl(x[[i]],
+                       wb = wb,
+                       sheet = sheet,
+                       start_row = start_row,
+                       start_col = start_col,
+                       header_style = header_style,
+                       header_color = header_color,
+                       fmt_side = fmt_side,
+                       open_wb = FALSE,
+                       pct_keys = pct_keys,
+                       auto_col_width = auto_col_width,
+                       cond_fmt_cols = cond_fmt_cols,
+                       keep_na = keep_na,
+                       verbose = verbose)
+
+    if (verbose == TRUE) {
+      # Progress bar
+      progr <- paste(rep("=", (20*i/length(x))), collapse="")
+      cat(sprintf("\r%s : %-20s| %-50s", "Writing", progr, l_names[[i]]))
+    }
+    # Update start_row in the parent enviroment.
+    start_row <- (start_row + (nrow(x[[i]]) + (rows_btwn + 1)))
+  }
+
+  # If user desires, open workbook
+  if (open_wb) {
+    if (verbose == TRUE) {
+      cat("\n")
+      cat("Opening Workbook \n")
+    }
+    openxlsx::openXL(wb)
+  }
+
+  invisible(wb)
+}
+
+# Prep sheet function.
+# If there is no sheet, create one.
+prep_sheet <- function(x, wb, sheet) {
+  if (is.null(sheet)) {
+    ob_n <- substitute(x)
+    sheet <- deparse(ob_n)
+    if (nchar(sheet) > 31) {
+      sheet <- paste0(substring(sheet, 1, 28), "...")
+    }
+
+    # Check for the values that cannot exist in an excel worksheet name.
+    sheet <- gsub(pattern = "\\*|\\?|\\]|\\[|:", replacement = "", x = sheet)
+    # Check if sheetname already exists in workbook. If it does
+    # append 2 onto it.
+    if (sheet %in% wb$sheet_names) {
+      sheet <- paste0(sheet, "(2)")
+    }
+    openxlsx::addWorksheet(wb = wb, sheetName = sheet, gridLines = FALSE)
+  }
+  return(sheet)
 }
